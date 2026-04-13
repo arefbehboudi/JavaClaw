@@ -17,6 +17,10 @@ allprojects {
             name = 'central-portal-snapshots'
             url = 'https://central.sonatype.com/repository/maven-snapshots/'
         }
+        // Cobalt declares Aspose + Jitpack repos in its Maven POM. Gradle doesn't inherit those repositories,
+        // so we add them explicitly to resolve transitive dependencies (e.g. com.aspose:aspose-words).
+        maven { url = 'https://releases.aspose.com/java/repo/' }
+        maven { url = 'https://jitpack.io' }
     }
 }
 

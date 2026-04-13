@@ -1,0 +1,79 @@
+<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
+    <h2 class="title is-3 mb-3">Connect WhatsApp (Linked Devices).</h2>
+    <p class="subtitle is-5 has-text-grey-dark">
+        This uses an <strong>unofficial</strong> WhatsApp Web / Linked Devices library (Cobalt). On first start it prints a QR code in the server logs;
+        scan it in WhatsApp → Settings → Linked devices → Link a device.
+    </p>
+
+    {% if error %}
+    <article class="message is-danger">
+        <div class="message-body">{{ error }}</div>
+    </article>
+    {% endif %}
+
+    <form method="post" action="/onboarding/whatsapp">
+        <div class="field">
+            <label class="label" for="whatsappSessionAlias">Session alias</label>
+            <div class="control">
+                <input id="whatsappSessionAlias" class="input is-medium" type="text" name="whatsappSessionAlias" value="{{ whatsappSessionAlias }}" placeholder="my-personal-whatsapp" autocomplete="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <p class="help">Used to persist/restore the session on disk. Changing it creates a new session requiring a new QR scan.</p>
+        </div>
+
+        <div class="field">
+            <label class="label" for="whatsappAllowedChatJid">Allowed WhatsApp chat JID</label>
+            <div class="control">
+                <input id="whatsappAllowedChatJid" class="input is-medium" type="text" name="whatsappAllowedChatJid" value="{{ whatsappAllowedChatJid }}" placeholder="15551234567@s.whatsapp.net or 12345-67890@g.us" autocomplete="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <p class="help">Only this chat will be allowed to control the agent from WhatsApp.</p>
+        </div>
+
+        <div id="whatsapp-link-fragment-container">
+            {% if whatsappConnKey %}
+            <div id="whatsapp-link-fragment"
+                 hx-get="/onboarding/whatsapp/fragment?key={{ whatsappConnKey }}"
+                 hx-trigger="load delay:500ms, every 2s"
+                 hx-swap="innerHTML">
+                <article class="message is-info">
+                    <div class="message-body">Connecting…</div>
+                </article>
+            </div>
+            {% else %}
+            <article class="message is-warning">
+                <div class="message-body">
+                    Click <strong>Generate QR</strong> to start linking. The QR will appear here.
+                </div>
+            </article>
+            {% endif %}
+        </div>
+
+        <div class="notification is-light mt-4">
+            <p class="has-text-weight-semibold mb-2">Stored properties</p>
+            <p class="has-text-grey-dark">agent.channels.whatsapp.enabled</p>
+            <p class="has-text-grey-dark">agent.channels.whatsapp.session-alias</p>
+            <p class="has-text-grey-dark">agent.channels.whatsapp.allowed-chat-jid</p>
+        </div>
+
+        <div class="buttons mt-4">
+            <a class="button is-light is-medium" href="{{ previousStepUrl }}">Back</a>
+            <button class="button is-link is-medium"
+                    type="button"
+                    hx-post="/onboarding/whatsapp/start"
+                    hx-include="#whatsappSessionAlias,#whatsappAllowedChatJid"
+                    hx-target="#whatsapp-link-fragment-container"
+                    hx-swap="outerHTML">
+                Generate QR
+            </button>
+
+            <button id="whatsapp-continue-btn"
+                    class="button is-primary is-medium"
+                    type="submit"
+                    {% if not whatsappLinked %}disabled aria-disabled="true"{% endif %}>
+                Continue
+            </button>
+            {% if isOptional %}<a class="button is-ghost is-medium" href="{{ nextStepUrl }}">Skip</a>{% endif %}
+            <span class="button is-ghost is-medium htmx-indicator">Saving...</span>
+        </div>
+    </form>
+</div>
