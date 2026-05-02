@@ -1,0 +1,20 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    implementation project(':base')
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Unofficial WhatsApp Web / Linked Devices library (QR login, session persistence, events).
+    // If this version breaks, bump it and adjust the API calls in WhatsappService/WhatsappChannel.
+    implementation 'com.github.auties00:cobalt:0.0.10'
+
+    // This plugin optionally exposes REST endpoints; the main app already includes WebMVC.
+    // Keeping this as compileOnly avoids pulling WebMVC into non-web apps that might depend on the plugin.
+    compileOnly 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
